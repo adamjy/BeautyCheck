@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Beauty Check</string>
+    <string name="action_settings">Settings</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="about">作者: AdamJiang\nEmal:adamjy90@hotmail.com</string>
+    <string name="is_loading">加载中……</string>
+    <string name="is_positive">确定</string>
+    
+</resources>

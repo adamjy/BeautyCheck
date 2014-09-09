@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#262626"
+    android:orientation="vertical" >
+
+    <TextView
+        android:id="@+id/tv_menu_classify"
+        android:layout_width="match_parent"
+        android:layout_height="55dp"
+        android:padding="3dp"
+        android:text="分类"
+        android:textColor="@color/white"
+        android:textSize="18sp"
+        android:visibility="invisible" />
+
+    <ListView
+        android:id="@+id/lv_left_menu"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="5dp"
+        android:layout_weight="1.0"
+        android:cacheColorHint="@android:color/transparent"
+        android:divider="@null"
+        android:fadingEdge="none"
+        android:focusable="true"
+        android:listSelector="@drawable/transparent"
+        android:scrollbars="none"
+        android:visibility="visible" >
+    </ListView>
+
+    <LinearLayout
+        android:id="@+id/ll_about"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:layout_marginBottom="5dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal" >
+
+        <ImageView
+            android:id="@+id/iv_about"
+            android:layout_width="10dp"
+            android:layout_height="13dp"
+            android:layout_marginLeft="20dp"
+            android:background="@drawable/menu_arr_normal" />
+
+        <TextView
+            android:id="@+id/tv_about"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="15dp"
+            android:paddingBottom="15dp"
+            android:paddingTop="15dp"
+            android:singleLine="true"
+            android:textColor="@color/white"
+            android:text="关于"
+            android:textSize="18sp" />
+    </LinearLayout>
+
+</LinearLayout>
