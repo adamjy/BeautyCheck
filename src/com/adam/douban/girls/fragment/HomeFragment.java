@@ -9,6 +9,7 @@ import com.adam.douban.girls.ViewPagerActivity;
 import com.adam.douban.girls.base.BaseFragment;
 import com.adam.douban.girls.engine.MyVolley;
 import com.adam.douban.girls.utils.ConstantValues;
+import com.adam.douban.girls.utils.LogHelper;
 import com.adam.douban.girls.utils.NetTools;
 import com.adam.douban.girls.utils.PromptManager;
 import com.android.volley.VolleyError;
@@ -33,6 +34,7 @@ import android.widget.Toast;
 
 public class HomeFragment extends BaseFragment implements OnClickListener {
 	protected static final String TAG = "HomeFragment";
+	private boolean DEBUG = true;
 	private View view;
 	private ListView lvLeft;
 	private ListView lvRight;
@@ -52,23 +54,24 @@ public class HomeFragment extends BaseFragment implements OnClickListener {
 
 	/**
 	 * 设置分类地址baseurl
+	 * 
 	 * @param baseUrl
 	 */
 	public void setBaseUrl(String baseUrl) {
-		mPageIndex = 0;
+		mPageIndex = 1;
 		mIsLastPage = false;
 		this.baseUrl = baseUrl;
 	}
-	
+
 	/**
 	 * menu选择分类后，通知adapter更新数据
 	 */
 	public void notifyAdatperChange() {
-		if(mAdapterLeft != null && mAdapterRight != null) {
-			mPageIndex = 0;
-			tvPageIndex.setText("第" + (mPageIndex+1) + "页");
-			startRequest(getImamgeUrl(baseUrl, mPageIndex*2),true);
-			startRequest(getImamgeUrl(baseUrl, mPageIndex*2 + 1), false);
+		if (mAdapterLeft != null && mAdapterRight != null) {
+			mPageIndex = 1;
+			tvPageIndex.setText("第" + mPageIndex  + "页");
+			startRequest(getImamgeUrl(baseUrl, mPageIndex * 2 - 1), true);
+			startRequest(getImamgeUrl(baseUrl, mPageIndex * 2), false);
 		}
 	}
 
@@ -76,20 +79,19 @@ public class HomeFragment extends BaseFragment implements OnClickListener {
 	public void initData() {
 		mUrlsLeft = new ArrayList<String>();
 		mUrlsRight = new ArrayList<String>();
-		
+
 		mAdapterLeft = new ListViewAdapter(mUrlsLeft);
 		mAdapterRight = new ListViewAdapter(mUrlsRight);
-		
-//		lvLeft.setAdapter(mAdapterLeft);
-//		lvRight.setAdapter(mAdapterRight);
+
+		// lvLeft.setAdapter(mAdapterLeft);
+		// lvRight.setAdapter(mAdapterRight);
 		lvLeft.setAdapter(mAdapterLeft);
 		lvRight.setAdapter(mAdapterRight);
-		
+
 		lvLeft.setOnItemClickListener(new OnItemClickListener() {
 
 			@Override
-			public void onItemClick(AdapterView<?> parent, View view,
-					int position, long id) {
+			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 				Intent intent = new Intent(ctx, ViewPagerActivity.class);
 				Bundle b = new Bundle();
 				b.putStringArrayList("urls", mUrlsLeft);
@@ -101,8 +103,7 @@ public class HomeFragment extends BaseFragment implements OnClickListener {
 		lvRight.setOnItemClickListener(new OnItemClickListener() {
 
 			@Override
-			public void onItemClick(AdapterView<?> parent, View view,
-					int position, long id) {
+			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 				Intent intent = new Intent(ctx, ViewPagerActivity.class);
 				Bundle b = new Bundle();
 				b.putStringArrayList("urls", mUrlsRight);
@@ -111,55 +112,58 @@ public class HomeFragment extends BaseFragment implements OnClickListener {
 				ctx.startActivity(intent);
 			}
 		});
-		
+
 		baseUrl = ConstantValues.baseUrls[0];
-		mPageIndex = 0;
+		mPageIndex = 1;
 		PromptManager.showProgressDialog(ctx);
-		startRequest(getImamgeUrl(baseUrl, mPageIndex*2),true);
-		startRequest(getImamgeUrl(baseUrl, mPageIndex*2 + 1), false);
+		startRequest(getImamgeUrl(baseUrl, mPageIndex), true);
+		startRequest(getImamgeUrl(baseUrl, mPageIndex + 1), false);
 	}
-	
+
 	/**
 	 * Start to request
+	 * 
 	 * @param url
-	 * @param ifLeft whether is left listview request data
+	 * @param ifLeft
+	 *            whether is left listview request data
 	 */
 	public void startRequest(String url, final boolean isLeft) {
-		StringRequest request = new StringRequest(
-				url, new Listener<String>() {
+		StringRequest request = new StringRequest(url, new Listener<String>() {
 
-					@Override
-					public void onResponse(String arg0) {
-						if(mIsRefresh) {
-							ivRefresh.setVisibility(View.VISIBLE);
-							mIsRefresh = false;
-						}
-						PromptManager.closeProgressDialog();
-						if(NetTools.getImgUrls(arg0).isEmpty()) {
-							Toast.makeText(ctx, "已经是最后一页了~", 0).show();
-							mIsLastPage = true;
-							return;
-						}
-						if(isLeft) {
-							mUrlsLeft.clear();
-							mUrlsLeft.addAll(NetTools.getImgUrls(arg0));
-							mAdapterLeft.notifyDataSetChanged();
-							lvLeft.setSelection(0);
-						} else {
-							mUrlsRight.clear();
-							mUrlsRight.addAll(NetTools.getImgUrls(arg0));
-							mAdapterRight.notifyDataSetChanged();
-							lvRight.setSelection(0);
-						}
-					}
-				}, new ErrorListener() {
+			@Override
+			public void onResponse(String arg0) {
+				if (DEBUG)
+					LogHelper.d(TAG, "receive response: " + arg0);
+				if (mIsRefresh) {
+					ivRefresh.setVisibility(View.VISIBLE);
+					mIsRefresh = false;
+				}
+				PromptManager.closeProgressDialog();
+				if (NetTools.getImgUrls(arg0).isEmpty()) {
+					Toast.makeText(ctx, "已经是最后一页了~", 0).show();
+					mIsLastPage = true;
+					return;
+				}
+				if (isLeft) {
+					mUrlsLeft.clear();
+					mUrlsLeft.addAll(NetTools.getImgUrls(arg0));
+					mAdapterLeft.notifyDataSetChanged();
+					lvLeft.setSelection(0);
+				} else {
+					mUrlsRight.clear();
+					mUrlsRight.addAll(NetTools.getImgUrls(arg0));
+					mAdapterRight.notifyDataSetChanged();
+					lvRight.setSelection(0);
+				}
+			}
+		}, new ErrorListener() {
 
-					@Override
-					public void onErrorResponse(VolleyError arg0) {
-						PromptManager.closeProgressDialog();
-						Toast.makeText(ctx, "服务器错误", 0).show();
-					}
-				});
+			@Override
+			public void onErrorResponse(VolleyError arg0) {
+				PromptManager.closeProgressDialog();
+				Toast.makeText(ctx, "服务器错误", 0).show();
+			}
+		});
 		MyVolley.addRequest(request);
 	}
 
@@ -169,7 +173,7 @@ public class HomeFragment extends BaseFragment implements OnClickListener {
 		lvLeft = (ListView) view.findViewById(R.id.home_lv_left);
 		lvRight = (ListView) view.findViewById(R.id.home_lv_right);
 		tvPageIndex = (TextView) view.findViewById(R.id.home_tv_page_index);
-		
+
 		btnPrev = (Button) view.findViewById(R.id.home_btn_prev);
 		btnNext = (Button) view.findViewById(R.id.home_btn_next);
 		ivMenu = (ImageView) view.findViewById(R.id.iv_titlebar);
@@ -178,7 +182,7 @@ public class HomeFragment extends BaseFragment implements OnClickListener {
 		btnNext.setOnClickListener(this);
 		ivMenu.setOnClickListener(this);
 		ivRefresh.setOnClickListener(this);
-		
+
 		return view;
 	}
 
@@ -208,63 +212,64 @@ public class HomeFragment extends BaseFragment implements OnClickListener {
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent) {
 			if (convertView == null) {
-				convertView = View
-						.inflate(ctx, R.layout.item_listview, null);
+				convertView = View.inflate(ctx, R.layout.item_listview, null);
 			}
-			
-			MyVolley.getImage(imgUrls.get(position), (ImageView)convertView.findViewById(R.id.iv_item_lv), 
-					R.drawable.ic_default, 
+
+			MyVolley.getImage(imgUrls.get(position),
+					(ImageView) convertView.findViewById(R.id.iv_item_lv), R.drawable.ic_default,
 					R.drawable.ic_error);
-			
+
 			return convertView;
 		}
 
 	}
-	
+
 	/**
 	 * Get real url of image
+	 * 
 	 * @param baseurl
 	 * @param pageIndex
 	 * @return
 	 */
 	public String getImamgeUrl(String baseurl, int pageIndex) {
-		return baseurl + "?p=" + pageIndex;
+		return baseurl + "page/" + pageIndex + "/";
+//		return baseurl + "?p=" + pageIndex;
 	}
 
 	@Override
 	public void onClick(View v) {
 		switch (v.getId()) {
 		case R.id.home_btn_prev:
-			if(mPageIndex == 0) {
+			if (mPageIndex == 1) {
 				return;
 			}
 			mPageIndex--;
-			startRequest(getImamgeUrl(baseUrl, mPageIndex*2), true);
-			startRequest(getImamgeUrl(baseUrl, mPageIndex*2 + 1), false);
-			tvPageIndex.setText("第" + (mPageIndex+1) + "页");
+			startRequest(getImamgeUrl(baseUrl, mPageIndex * 2 - 1), true);
+			startRequest(getImamgeUrl(baseUrl, mPageIndex * 2), false);
+			tvPageIndex.setText("第" + mPageIndex + "页");
 			mIsLastPage = false;
 			break;
 		case R.id.home_btn_next:
-			if(mIsLastPage) {
+			if (mIsLastPage) {
 				Toast.makeText(ctx, "已经是最后一页了~", 0).show();
 			}
 			mPageIndex++;
-			startRequest(getImamgeUrl(baseUrl, mPageIndex*2), true);
-			startRequest(getImamgeUrl(baseUrl, mPageIndex*2 + 1), false);
-			tvPageIndex.setText("第" + (mPageIndex+1) + "页");
+			startRequest(getImamgeUrl(baseUrl, mPageIndex * 2 - 1), true);
+			startRequest(getImamgeUrl(baseUrl, mPageIndex * 2), false);
+			tvPageIndex.setText("第" + mPageIndex + "页");
 			break;
 		case R.id.iv_titlebar:
-			((MainActivity)ctx).getSm().toggle();
+			((MainActivity) ctx).getSm().toggle();
 			break;
 		case R.id.iv_refresh:
-			startRequest(getImamgeUrl(baseUrl, mPageIndex*2), true);
-			startRequest(getImamgeUrl(baseUrl, mPageIndex*2 + 1), false);
+			startRequest(getImamgeUrl(baseUrl, mPageIndex * 2 -1), true);
+			startRequest(getImamgeUrl(baseUrl, mPageIndex * 2), false);
 			ivRefresh.setVisibility(View.INVISIBLE);
 			PromptManager.showRefreshDialog(ctx);
 			mIsRefresh = true;
 			break;
 		}
-		
+
 	}
 
 }

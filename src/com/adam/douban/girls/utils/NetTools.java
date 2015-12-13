@@ -8,6 +8,8 @@ import java.util.regex.Pattern;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Debug;
+import android.util.Log;
 
 /**
  * Net util
@@ -16,6 +18,8 @@ import android.net.NetworkInfo;
  * 2014下午5:57:16
  */
 public class NetTools {
+	private static final String TAG = NetTools.class.getSimpleName();
+	private static boolean DEBUG = true;
 	/**
 	 * Scrap url from internet
 	 * @param url Image html code
@@ -39,6 +43,9 @@ public class NetTools {
 		if(urlList.size() > 2) {
 			urlList.remove(0);
 			urlList.remove(urlList.size() - 1);
+		}
+		for (String string : urlList) {
+			if(DEBUG) LogHelper.d(TAG, "url: " + string);
 		}
 		return urlList;
 	}
